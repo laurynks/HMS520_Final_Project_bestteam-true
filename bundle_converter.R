@@ -11,4 +11,4 @@ sample_DisMod <- get_bundle_data(bundle_id = 435,
                                  decomp_step = "iterative",
                                  gbd_round_id = 7)
 
-sample_STGPR <- get_crosswalk_version(crosswalk_version_id = 31258)
+sample_STGPR <- get_crosswalk_version(crosswalk_version_id = 31250)
