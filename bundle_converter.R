@@ -19,6 +19,8 @@ input_dismod_bundle <- sample_DISMOD_cp
 
 ## DISMOD to STGPR
 dismod_to_stgpr <- function(input_dismod_bundle){
+  columns <- colnames(input_dismod_bundle)
+  
   input_type_converter <- function(val) {
     # https://hub.ihme.washington.edu/pages/viewpage.action?pageId=18575819
     input_type <- c("Not set", "extracted", "adjusted", "split", "collapsed")
@@ -115,67 +117,6 @@ dismod_to_stgpr <- function(input_dismod_bundle){
     }
   }
   
-  columns <- colnames(input_dismod_bundle)
-  if (!("variance" %in% columns)){
-    message("Adding NA column 'variance'")
-    input_dismod_bundle <- input_dismod_bundle %>% mutate(variance = rep(NA, nrow(input_dismod_bundle)))
-  }
-  if (!("year_id" %in% columns)){
-    message("Adding column year_id (defined as the central year between year_start and year_end)")
-    input_dismod_bundle <- input_dismod_bundle %>% mutate(year_id = as.integer(round((year_start + year_end)/2, 2)))
-  }
-  if (!("val" %in% columns)){
-    message("Renaming col 'mean' to 'val'")
-    input_dismod_bundle <- input_dismod_bundle %>% rename(val = mean)
-  }
-  if (!("recall_type_id" %in% columns)){
-    if("recall_type" %in% columns){
-      message("creating column 'recall_type_id' from 'recall_type'")
-      input_dismod_bundle <- input_dismod_bundle %>% 
-        mutate(recall_type_id = sapply(recall_type, recall_type_converter))
-    } else {
-      stop("input bundle must either have column 'recall_type_id' or 'recall_type'")
-    }
-  }
-  if (!("input_type_id" %in% columns)){
-    if ("input_type" %in% columns) {
-      message("creating column 'input_type_id' from 'input_type'")
-      input_dismod_bundle <- input_dismod_bundle %>% 
-        mutate(input_type_id = sapply(input_type, input_type_converter))
-    } else {
-      stop("input bundle must either have column 'input_type' or 'input_type_id'")
-    }
-    # ID key might be wrong here
-    if (!("uncertainty_type_id" %in% columns)){
-      if("uncertainty_type" %in% columns){
-        message("creating column 'uncertainty_type_id' from 'uncertainty_type'")
-        input_dismod_bundle <- input_dismod_bundle %>% 
-          mutate(uncertainty_type_id = sapply(uncertainty_type, uncertainty_type_converter))
-      } else {
-        stop("input bundle must either have column 'uncertainty_type' or 'uncertainty_type_id'")
-      }
-    }
-    if (!("source_type_id" %in% columns)){
-      if("source_type" %in% columns){
-        message("creating column 'source_type_id' from 'source_type'")
-        input_dismod_bundle <- input_dismod_bundle %>% 
-          mutate(source_type_id = sapply(source_type, source_type_converter))
-      } else {
-        stop("input bundle must either have column 'source_type' or 'source_type_id'")
-      }
-    }
-  }
-  if (!("sampling_type_id" %in% columns)){
-    if("sampling_type" %in% columns){
-      message("creating column 'sampling_type_id' from 'sampling_type'")
-      input_dismod_bundle <- input_dismod_bundle %>% 
-        mutate(sampling_type_id = sapply(sampling_type, sampling_type_converter))
-    } 
-    else {
-      stop("input bundle must either have column 'sampling_type' or 'sampling_type_id'")
-    }
-  }
-  var_names <- c("recall", "placeholder")
   map_type_id <- function(var_name) {
     if (var_name = "representative") {
       if (!("representative_id" %in% columns)) {
@@ -195,17 +136,85 @@ dismod_to_stgpr <- function(input_dismod_bundle){
                        var_name, "_type'"))
         input_dismod_bundle <- input_dismod_bundle %>%
           mutate(paste0(var_name, "_type_id") = 
-                 sapply(get(paste0(var_name, "_type")), get(paste0(var_name, 
-                                                                   "_type_converter"))))
+                   sapply(get(paste0(var_name, "_type")), get(paste0(var_name, 
+                                                                     "_type_converter"))))
       }
       else {
         stop(paste0("input bundle must either have column '", var_name, 
                     "_type' or '", var_name, "_type_id'"))
       }
     }
+    return(input_dismod_bundle)
+  }
+  
+  if (!("variance" %in% columns)){
+    message("Adding NA column 'variance'")
+    input_dismod_bundle <- input_dismod_bundle %>% mutate(variance = rep(NA, nrow(input_dismod_bundle)))
+  }
+  if (!("year_id" %in% columns)){
+    message("Adding column year_id (defined as the central year between year_start and year_end)")
+    input_dismod_bundle <- input_dismod_bundle %>% mutate(year_id = as.integer(round((year_start + year_end)/2, 2)))
+  }
+  if (!("val" %in% columns)){
+    message("Renaming col 'mean' to 'val'")
+    input_dismod_bundle <- input_dismod_bundle %>% rename(val = mean)
+  }
+  var_names <- c("input", "recall", "representative", "sampling", "source", "uncertainty")
+  # Doing this in a for loop because each iteration of the dataset builds on the next one
+  for (var_name in var_names){
+    map_type_id(var_name)
   }
   # NOTE: might need to map unit type
   return(input_dismod_bundle)
 }
 
 dismod_to_stgpr(sample_DISMOD_cp)
+
+###################################################################################################
+if (!("recall_type_id" %in% columns)){
+  if("recall_type" %in% columns){
+    message("creating column 'recall_type_id' from 'recall_type'")
+    input_dismod_bundle <- input_dismod_bundle %>% 
+      mutate(recall_type_id = sapply(recall_type, recall_type_converter))
+  } else {
+    stop("input bundle must either have column 'recall_type_id' or 'recall_type'")
+  }
+}
+if (!("input_type_id" %in% columns)){
+  if ("input_type" %in% columns) {
+    message("creating column 'input_type_id' from 'input_type'")
+    input_dismod_bundle <- input_dismod_bundle %>% 
+      mutate(input_type_id = sapply(input_type, input_type_converter))
+  } else {
+    stop("input bundle must either have column 'input_type' or 'input_type_id'")
+  }
+  # ID key might be wrong here
+  if (!("uncertainty_type_id" %in% columns)){
+    if("uncertainty_type" %in% columns){
+      message("creating column 'uncertainty_type_id' from 'uncertainty_type'")
+      input_dismod_bundle <- input_dismod_bundle %>% 
+        mutate(uncertainty_type_id = sapply(uncertainty_type, uncertainty_type_converter))
+    } else {
+      stop("input bundle must either have column 'uncertainty_type' or 'uncertainty_type_id'")
+    }
+  }
+  if (!("source_type_id" %in% columns)){
+    if("source_type" %in% columns){
+      message("creating column 'source_type_id' from 'source_type'")
+      input_dismod_bundle <- input_dismod_bundle %>% 
+        mutate(source_type_id = sapply(source_type, source_type_converter))
+    } else {
+      stop("input bundle must either have column 'source_type' or 'source_type_id'")
+    }
+  }
+}
+if (!("sampling_type_id" %in% columns)){
+  if("sampling_type" %in% columns){
+    message("creating column 'sampling_type_id' from 'sampling_type'")
+    input_dismod_bundle <- input_dismod_bundle %>% 
+      mutate(sampling_type_id = sapply(sampling_type, sampling_type_converter))
+  } 
+  else {
+    stop("input bundle must either have column 'sampling_type' or 'sampling_type_id'")
+  }
+}
