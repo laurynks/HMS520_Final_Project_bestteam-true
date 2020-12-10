@@ -201,4 +201,6 @@ stgpr_to_dismod <- function(input_stgpr_bundle) {
   return(input_stgpr_bundle)
 }
 
+
+# test the function ============================================================
 test <- stgpr_to_dismod(sample_STGPR_cp)
