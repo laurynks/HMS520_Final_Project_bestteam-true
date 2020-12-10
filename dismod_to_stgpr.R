@@ -143,7 +143,7 @@ dismod_to_stgpr <- function(input_dismod_bundle){
   }
   
   map_type_id <- function(var_name) {
-    if (var_name = "representative") {
+    if (var_name == "representative") {
       if (!("representative_id" %in% columns)) {
         if("representative_name" %in% columns) {
           message("creating column 'representative_id' from 
