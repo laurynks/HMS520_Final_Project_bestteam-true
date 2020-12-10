@@ -6,6 +6,8 @@
 source("/ihme/cc_resources/libraries/current/r/get_bundle_data.R")
 source("/ihme/cc_resources/libraries/current/r/get_crosswalk_version.R")
 
+library(dplyr)
+
 # pull in sample DisMod bundle
 sample_DisMod <- get_bundle_data(bundle_id = 435, 
                                  decomp_step = "iterative",
@@ -16,8 +18,10 @@ sample_STGPR <- get_crosswalk_version(crosswalk_version_id = 31250)
 sample_STGPR_cp <- copy(sample_STGPR)
 sample_DISMOD_cp <- copy(sample_DisMod)
 input_dismod_bundle <- sample_DISMOD_cp
+input_stgpr_bundle <- sample_STGPR_cp
 
 stgpr_to_dismod <- function(input_stgpr_bundle){
+  input_stgpr_bundle <- as.data.frame(input_stgpr_bundle)
   columns <- colnames(input_stgpr_bundle)
   
   input_type_converter <- function(val) {
@@ -115,11 +119,11 @@ stgpr_to_dismod <- function(input_stgpr_bundle){
   }
   
   map_type_id <- function(var_name) {
-    if (var_name = "representative") {
+    if (var_name == "representative") {
       if (!("representative_name" %in% columns)) {
         if("representative_id" %in% columns) {
           message("creating column 'representative_name' from 'representative_id'")
-          input_dismod_bundle <- input_dismod_bundle %>% 
+          input_stgpr_bundle <- input_stgpr_bundle %>% 
             mutate(representative_name = sapply(representative_id, representative_type_converter))
         } 
         else {
@@ -128,33 +132,43 @@ stgpr_to_dismod <- function(input_stgpr_bundle){
       }
     }
     else {
+      input_stgpr_bundle[,paste0(var_name, '_type')] <- rep(NA, nrow(input_stgpr_bundle))
       if (!(paste0(var_name, "_type") %in% columns)) {
         message(paste0("creating column '", var_name, "_type' from '", 
                        var_name, "_type_id'"))
-        input_dismod_bundle <- input_dismod_bundle %>%
-          mutate(paste0(var_name, "_type") = 
-                   sapply(get(paste0(var_name, "_type_id")), get(paste0(var_name, 
-                                                                     "_type_converter"))))
+        #input_stgpr_bundle <- input_stgpr_bundle %>%
+        #  mutate(paste0(var_name, "_type") = 
+        #           sapply(get(paste0(var_name, "_type_id")), 
+        #                  get(paste0(var_name, "_type_converter"))))
+        store <- sapply(input_stgpr_bundle[,(paste0(var_name, "_type_id"))],
+                        get(paste0(var_name, "_type_converter")))
+        input_stgpr_bundle <- input_stgpr_bundle %>% mutate(!!paste0(var_name, "_type") := store)
+        input_stgpr_bundle <- input_stgpr_bundle %>% mutate("Jess" = rep("doone with this", nrow(input_stgpr_bundle)))
+        #input_stgpr_bundle[,paste0(var_name, '_type')]  <- store
+        #sapply(store, #sapply(input_stgpr_bundle[,(paste0(var_name, "_type_id"))],
+        #          get(paste0(var_name, "_type_converter")))
       }
       else {
         stop(paste0("input bundle must either have column '", var_name, 
                     "_type' or '", var_name, "_type_id'"))
       }
     }
-    return(input_dismod_bundle)
+    return(input_stgpr_bundle)
   }
-
+  
   if (!("mean" %in% columns)){
     message("Renaming col 'val' to 'mean'")
-    input_dismod_bundle <- input_dismod_bundle %>% rename(mean = val)
+    input_stgpr_bundle <- input_stgpr_bundle %>% rename(mean = val)
   }
+  
   var_names <- c("input", "recall", "representative", "sampling", "source", "uncertainty")
   # Doing this in a for loop because each iteration of the dataset builds on the next one
   for (var_name in var_names){
     map_type_id(var_name)
   }
+  
   # NOTE: might need to map unit type
-  return(input_dismod_bundle)
+  return(input_stgpr_bundle)
 }
 
-dismod_to_stgpr(sample_DISMOD_cp)
+test <- stgpr_to_dismod(sample_STGPR_cp)
