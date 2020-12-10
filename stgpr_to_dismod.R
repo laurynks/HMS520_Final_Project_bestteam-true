@@ -118,7 +118,7 @@ stgpr_to_dismod <- function(input_stgpr_bundle){
     }
   }
   
-  map_type_id <- function(var_name) {
+  map_type_id <- function(var_name, data) {
     if (var_name == "representative") {
       if (!("representative_name" %in% columns)) {
         if("representative_id" %in% columns) {
@@ -132,7 +132,7 @@ stgpr_to_dismod <- function(input_stgpr_bundle){
       }
     }
     else {
-      input_stgpr_bundle[,paste0(var_name, '_type')] <- rep(NA, nrow(input_stgpr_bundle))
+      #input_stgpr_bundle[,paste0(var_name, '_type')] <- rep(NA, nrow(input_stgpr_bundle))
       if (!(paste0(var_name, "_type") %in% columns)) {
         message(paste0("creating column '", var_name, "_type' from '", 
                        var_name, "_type_id'"))
@@ -164,7 +164,7 @@ stgpr_to_dismod <- function(input_stgpr_bundle){
   var_names <- c("input", "recall", "representative", "sampling", "source", "uncertainty")
   # Doing this in a for loop because each iteration of the dataset builds on the next one
   for (var_name in var_names){
-    map_type_id(var_name)
+    input_stgpr_bundle <- map_type_id(var_name, input_stgpr_bunde)
   }
   
   # NOTE: might need to map unit type
