@@ -36,7 +36,7 @@ weighted_mean <- function(df,
   } else {
     # Otherwise, use a standard location_set_id
     # 22 (covariate computation) has everything 35 (model results) has and more
-    location_set_id == 22
+    location_set_id = 22
   }
   
   # retrieve and merge IHME population data ------------------------------------
@@ -91,5 +91,5 @@ test_df <- get_model_results(
   decomp_step = 'iterative'
 )
 
-t2 <- weighted_mean(test_df, c("sex_id", "age_group_id"))
+t2 <- weighted_mean(test_df, c("sex_id", "age_group_id"), is_model_results = TRUE)
 t2
