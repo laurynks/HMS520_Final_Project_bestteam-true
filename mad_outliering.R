@@ -8,49 +8,46 @@
 
 rm(list=ls())
 
-# working environment
-if (Sys.info()["sysname"] == "Linux") {
-  j_root <- "/snfs1/"
-  h_root <- "~/"
-  l_root <- "/ihme/limited_use/"
-} else {
-  j_root <- "J:/"
-  h_root <- "H:/"
-  l_root <- "L:/"
-}
-
-# source central functions
+# load packages and functions
 functions_dir <- "/ihme/cc_resources/libraries/current/r/"
 
 source(paste0(functions_dir, "get_age_metadata.R"))
 source(paste0(functions_dir, "get_bundle_version.R"))
 
 library("data.table")
-library("readr")
-library("RMySQL")
-library("openxlsx")
-library("readxl")
-library("stringr")
 library("tidyr")
-library("plyr")
 library("dplyr")
 
+# mad outliering function --------------------------------------------------------------
 
-# set objects 
-outlier_val <- 2 # MAD outliering value
-
-byvars <- c("location_id", "sex", "year_start", "year_end", "nid") # unique data identifiers
-
-# input data 
-dt <- get_bundle_version(bundle_version_id = 22562, fetch = "all") # data to be run through mad outliering function
-
-# getting age weights
-all_fine_ages <- as.data.table(get_age_metadata(age_group_set_id=19, gbd_round_id = 7))
-
-# mad outliering function
-mad_outliering <- function(dt, all_fine_ages, byvars, outlier_val) {
+mad_outliering <- function(dt, age_group_set_id, gbd_round_id, byvars, outlier_val) {
+  ## checks
+  ### make sure dt is a data.table
+  if (!is.data.table(dt)) {
+    stop("Input data must be a data.table")
+  }
+  ### make sure age_group_set_id is valid
+  if (!(age_group_set_id %in% 1:23)) {
+    stop("Please enter a valid age_group_set_id")
+  }
+  ### make sure gbd_round_id is valid
+  if (!(gbd_round_id %in% 3:8)) {
+    stop("Please enter a valid gbd_round_id")
+  }
+  ### make sure byvars is a character vector
+  if (!is.character(byvars)) {
+    stop("byvars must be a character vector")
+  }
+  ### make sure outlier_val is numeric
+  if (!is.numeric(outlier_val)) {
+    stop("outlier_val must be numeric")
+  }
+  
   ## make a set to be run through outlier script
   dt_inp <- copy(dt)
+  
+  # getting age weights
+  all_fine_ages <- as.data.table(get_age_metadata(age_group_set_id, gbd_round_id))
   
   ## merge age table map and merge on to dataset
   all_fine_ages[, age_start := age_group_years_start]
@@ -58,7 +55,7 @@ mad_outliering <- function(dt, all_fine_ages, byvars, outlier_val) {
   
   ## create new age-weights for each data source
   dt_inp[, sum := sum(age_group_weight_value), by = byvars]
-  dt_inp[, new_weight := age_group_weight_value/sum, by = byvars] 
+  dt_inp[, new_weight := age_group_weight_value/sum, by = byvars]
   
   ## age standardizing per location-year by sex
   dt_inp[, as_mean := mean * new_weight]
@@ -90,4 +87,18 @@ mad_outliering <- function(dt, all_fine_ages, byvars, outlier_val) {
   return(dt_inp)
 }
 
-mad_outliering_test <- mad_outliering(dt, all_fine_ages, byvars, outlier_val)
+# testing -------------------------------------------------------------------------------
+
+# set objects, load data for test 
+outlier_val <- 2 # MAD outliering value
+
+byvars <- c("location_id", "sex", "year_start", "year_end", "nid") # unique data identifiers
+
+dt <- get_bundle_version(bundle_version_id = 22562, fetch = "all") # data to be run through mad outliering function
+
+age_group_set_id <- 19 # for get_age_metadata
+
+gbd_round_id <- 7 # for get_age_metadata
+
+# test
+mad_outliering_test <- mad_outliering(dt, age_group_set_id, gbd_round_id, byvars, outlier_val)
