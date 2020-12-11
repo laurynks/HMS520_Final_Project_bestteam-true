@@ -202,8 +202,9 @@ dismod_to_stgpr <- function(input_dismod_bundle){
   
   # see if age_group_id exists
   if(!("age_group_id") %in% columns) {
-    # warning for now so the code runs; in its final form should be a stop
-    warning("User must manually input age_group_id column")s
+    # warning for now so the code runs; in its final form should be a 
+    # stop
+    warning("User must manually input age_group_id column")
   }
   
   
