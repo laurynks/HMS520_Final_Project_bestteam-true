@@ -6,7 +6,7 @@
 source("/ihme/cc_resources/libraries/current/r/get_bundle_data.R")
 source("/ihme/cc_resources/libraries/current/r/get_crosswalk_version.R")
 
-# pull in sample DisMod bundle
+# pull in sample bundles =======================================================
 sample_DisMod <- get_bundle_data(bundle_id = 435, 
                                  decomp_step = "iterative",
                                  gbd_round_id = 7)
@@ -17,10 +17,11 @@ sample_STGPR_cp <- copy(sample_STGPR)
 sample_DISMOD_cp <- copy(sample_DisMod)
 input_dismod_bundle <- sample_DISMOD_cp
 
-## DISMOD to STGPR
+# create function ==============================================================
 dismod_to_stgpr <- function(input_dismod_bundle){
   columns <- colnames(input_dismod_bundle)
   
+  # create all the mapping functions -------------------------------------------
   input_type_converter <- function(val) {
     # https://hub.ihme.washington.edu/pages/viewpage.action?pageId=18575819
     input_type <- c("Not set", "extracted", "adjusted", "split", "collapsed")
@@ -142,32 +143,39 @@ dismod_to_stgpr <- function(input_dismod_bundle){
     }
   }
   
+  # create a function to run all the maps -------------------------------------
   map_type_id <- function(var_name) {
+    # special case for representative becaues it's named differently
     if (var_name == "representative") {
       if (!("representative_id" %in% columns)) {
         if("representative_name" %in% columns) {
           message("creating column 'representative_id' from 
                   'representative_name'")
+          # create new column
           input_dismod_bundle <- input_dismod_bundle %>% 
             mutate(representative_id = sapply(representative_name, 
                                               representative_type_converter))
         } 
         else {
+          # neither column exists in the data
           stop("input bundle must either have column 'representative_name' or 
                'representative_id'")
         }
       }
     }
+    # for all the other variables besides representative
     else {
       if (!(paste0(var_name, "_type_id") %in% columns)) {
+        # create the newly mapped column
         message(paste0("creating column '", var_name, "_type_id' from '", 
                        var_name, "_type'"))
         input_dismod_bundle <- input_dismod_bundle %>%
-          mutate(paste0(var_name, "_type_id") = 
+          mutate(!!paste0(var_name, "_type_id") := 
                    sapply(get(paste0(var_name, "_type")), 
                           get(paste0(var_name, "_type_converter"))))
       }
       else {
+        # niether variable exists in the data
         stop(paste0("input bundle must either have column '", var_name, 
                     "_type' or '", var_name, "_type_id'"))
       }
@@ -175,17 +183,24 @@ dismod_to_stgpr <- function(input_dismod_bundle){
     return(input_dismod_bundle)
   }
   
+  # Other fixes --------------------------------------------------------------
+  # Create column variance as a bunch of NAs
   if (!("variance" %in% columns)){
     message("Adding NA column 'variance'")
     input_dismod_bundle <- input_dismod_bundle %>% 
       mutate(variance = rep(NA, nrow(input_dismod_bundle)))
   }
+  
+  # create the column year_id as the central year between year_start
+  # and year_end
   if (!("year_id" %in% columns)){
     message("Adding column year_id (defined as the central year between 
             year_start and year_end)")
     input_dismod_bundle <- input_dismod_bundle %>% 
       mutate(year_id = as.integer(round((year_start + year_end)/2)))
   }
+  
+  # rename the column "mean" to "val"
   if (!("val" %in% columns)){
     message("Renaming col 'mean' to 'val'")
     input_dismod_bundle <- input_dismod_bundle %>% rename(val = mean)
@@ -201,4 +216,5 @@ dismod_to_stgpr <- function(input_dismod_bundle){
   return(input_dismod_bundle)
 }
 
-dismod_to_stgpr(sample_DISMOD_cp)
+# Test the function =============================================================
+test <- dismod_to_stgpr(sample_DISMOD_cp)
