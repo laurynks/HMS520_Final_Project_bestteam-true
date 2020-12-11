@@ -15,7 +15,7 @@
 #' @return A data frame with age-standardized data.
 #' @export
 #'
-#' @examples weighted_mean(diabetes_model_results, c("sex_id", "age_group_id"), is_model_results = TRUE)
+#' @examples
 weighted_mean <- function(df,
                           weight_by,
                           gbd_round_id = 7,

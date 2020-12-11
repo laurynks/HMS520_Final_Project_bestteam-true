@@ -11,7 +11,7 @@
 #' @return The inputted bundle data, converted to DisMod shape.
 #' @export
 #'
-#' @examples stgpr_to_dismod(diabetes_stgpr_bundle)
+#' @examples
 stgpr_to_dismod <- function(input_stgpr_bundle) {
   input_stgpr_bundle <- as.data.frame(input_stgpr_bundle)
   columns <- colnames(input_stgpr_bundle)

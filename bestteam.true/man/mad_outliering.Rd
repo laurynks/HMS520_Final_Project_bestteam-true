@@ -23,6 +23,3 @@ A data.table with updated outliers, identified through MAD outliering, and noted
 \description{
 MAD Outliering
 }
-\examples{
-mad_outliering(diabetes_bundle_version, 19, 7, c("location_id", "sex", "year_start", "year_end", "nid"), 2)
-}

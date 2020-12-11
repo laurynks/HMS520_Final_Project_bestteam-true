@@ -15,6 +15,3 @@ The inputted bundle data, converted to ST-GPR shape.
 \description{
 DisMod to ST-GPR Bundle Converter
 }
-\examples{
-dismod_to_stgpr(diabetes_dismod_bundle)
-}

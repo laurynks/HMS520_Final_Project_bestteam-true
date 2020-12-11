@@ -30,3 +30,5 @@ Imports:
     data.table,
     tidyr,
     dplyr
+Suggests: 
+    testthat

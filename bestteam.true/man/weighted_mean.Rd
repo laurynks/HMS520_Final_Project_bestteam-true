@@ -29,6 +29,3 @@ A data frame with age-standardized data.
 \description{
 Weighted Means Function to Age-Standardize GBD Outputs
 }
-\examples{
-weighted_mean(diabetes_model_results, c("sex_id", "age_group_id"), is_model_results = TRUE)
-}

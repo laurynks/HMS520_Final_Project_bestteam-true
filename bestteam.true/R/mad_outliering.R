@@ -16,7 +16,7 @@
 #' @return A data.table with updated outliers, identified through MAD outliering, and noted by a value of 1 in "is_outlier" column and a comment in "note_modeler".
 #' @export
 #'
-#' @examples mad_outliering(diabetes_bundle_version, 19, 7, c("location_id", "sex", "year_start", "year_end", "nid"), 2)
+#' @examples
 mad_outliering <- function(dt, age_group_set_id, gbd_round_id, byvars, outlier_val) {
   ## sourcing shared functions
   source("/ihme/cc_resources/libraries/current/r/get_age_metadata.R")
