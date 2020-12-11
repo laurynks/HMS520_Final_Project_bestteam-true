@@ -200,6 +200,13 @@ dismod_to_stgpr <- function(input_dismod_bundle){
       mutate(year_id = as.integer(round((year_start + year_end)/2)))
   }
   
+  # see if age_group_id exists
+  if(!("age_group_id") %in% columns) {
+    # warning for now so the code runs; in its final form should be a stop
+    warning("User must manually input age_group_id column")s
+  }
+  
+  
   # rename the column "mean" to "val"
   if (!("val" %in% columns)){
     message("Renaming col 'mean' to 'val'")
@@ -218,3 +225,4 @@ dismod_to_stgpr <- function(input_dismod_bundle){
 
 # Test the function =============================================================
 test <- dismod_to_stgpr(sample_DISMOD_cp)
+
