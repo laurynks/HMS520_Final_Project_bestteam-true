@@ -218,7 +218,7 @@ dismod_to_stgpr <- function(input_dismod_bundle){
   # Doing this in a for loop because each iteration of the dataset builds on the
   # next one
   for (var_name in var_names){
-    map_type_id(var_name)
+    input_dismod_bundle <- map_type_id(var_name)
   }
   # NOTE: might need to map unit type
   return(input_dismod_bundle)
@@ -226,4 +226,3 @@ dismod_to_stgpr <- function(input_dismod_bundle){
 
 # Test the function =============================================================
 test <- dismod_to_stgpr(sample_DISMOD_cp)
-
