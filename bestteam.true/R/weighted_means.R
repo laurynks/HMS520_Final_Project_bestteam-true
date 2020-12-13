@@ -12,10 +12,19 @@
 #' @param decomp_step The decomp_step for the get_population and get_location_metadata shared functions, the default value is "iterative"
 #' @param is_model_results A boolean variable, set as 'TRUE' (the default) if the input is model_results; if 'FALSE', the user must enter a location_set_id
 #'
-#' @return A data frame with age-standardized data.
+#' @return A data frame where the inputs are standardized for the specified parameters.
 #' @export
 #'
-#' @examples
+#' @examples source("/ihme/cc_resources/libraries/current/r/get_model_results.R")
+#' test_df <- get_model_results(
+#' gbd_team = 'epi',
+#' gbd_id = 25217,
+#' age_group_id = c(7, 8, 9, 10, 11, 12, 13, 14, 15), # mutually exclusive age groups for 10-54
+#' year_id = 2020,
+#' sex_id = c(1,2),
+#' decomp_step = 'iterative'
+#' )
+#' t2 <- weighted_mean(test_df, c("sex_id", "age_group_id"), is_model_results = TRUE)
 weighted_mean <- function(df,
                           weight_by,
                           gbd_round_id = 7,

@@ -6,12 +6,14 @@
 
 #' ST-GPR to DisMod Bundle Converter
 #'
-#' @param input_stgpr_bundle A crosswalk version of a ST-GPR shape bundle.
+#' @param input_stgpr_bundle Bundle data in ST-GPR shape.
 #'
 #' @return The inputted bundle data, converted to DisMod shape.
 #' @export
 #'
-#' @examples
+#' @examples source("/ihme/cc_resources/libraries/current/r/get_crosswalk_version.R")
+#' sample_STGPR <- get_crosswalk_version(crosswalk_version_id = 31250)
+#' stgpr_to_dismod(sample_STGPR)
 stgpr_to_dismod <- function(input_stgpr_bundle) {
   input_stgpr_bundle <- as.data.frame(input_stgpr_bundle)
   columns <- colnames(input_stgpr_bundle)

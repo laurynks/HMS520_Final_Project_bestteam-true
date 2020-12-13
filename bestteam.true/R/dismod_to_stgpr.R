@@ -11,7 +11,11 @@
 #' @return The inputted bundle data, converted to ST-GPR shape.
 #' @export
 #'
-#' @examples
+#' @examples source("/ihme/cc_resources/libraries/current/r/get_bundle_data.R")
+#' sample_DisMod <- get_bundle_data(bundle_id = 435,
+#' decomp_step = "iterative",
+#' gbd_round_id = 7)
+#' dismod_to_stgpr(sample_DisMod)
 dismod_to_stgpr <- function(input_dismod_bundle){
   columns <- colnames(input_dismod_bundle)
 
@@ -212,7 +216,7 @@ dismod_to_stgpr <- function(input_dismod_bundle){
   # Doing this in a for loop because each iteration of the dataset builds on the
   # next one
   for (var_name in var_names){
-    map_type_id(var_name)
+    input_dismod_bundle <- map_type_id(var_name)
   }
   # NOTE: might need to map unit type
   return(input_dismod_bundle)
