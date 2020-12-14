@@ -16,7 +16,10 @@
 #' @return A data.table with updated outliers, identified through MAD outliering, and noted by a value of 1 in "is_outlier" column and a comment in "note_modeler".
 #' @export
 #'
-#' @examples
+#' @examples source("/ihme/cc_resources/libraries/current/r/get_bundle_version.R")
+#' dt <- get_bundle_version(bundle_version_id = 22562, fetch = "all")
+#' byvars <- c("location_id", "sex", "year_start", "year_end", "nid")
+#' mad_outliering(dt, 19, 7, byvars, 2)
 mad_outliering <- function(dt, age_group_set_id, gbd_round_id, byvars, outlier_val) {
   ## sourcing shared functions
   source("/ihme/cc_resources/libraries/current/r/get_age_metadata.R")
@@ -77,7 +80,7 @@ mad_outliering <- function(dt, age_group_set_id, gbd_round_id, byvars, outlier_v
   dt_inp[as_mean>((outlier_val*mad)+median), note_modeler := paste0(note_modeler, " | outliered because age-standardized mean for location-year-sex-NID is higher than ", outlier_val," MAD above median")]
   dt_inp[as_mean<(median-(outlier_val*mad)), is_outlier := 1]
   dt_inp[as_mean<(median-(outlier_val*mad)), note_modeler := paste0(note_modeler, " | outliered because log age-standardized mean for location-year-sex-NID is lower than ", outlier_val," MAD below median")]
-  dt_inp[, c("sum", "new_weight", "as_mean", "median", "mad", "age_group_weight_value", "age_group_id") := NULL]
+  dt_inp[, c("sum", "new_weight", "as_mean", "median", "mad", "age_group_weight_value", "age_group_id", "age_group_name", "age_group_years_start", "age_group_years_end", "most_detailed") := NULL]
 
   dt_inp[is.na(lower), uncertainty_type_value := NA]
 

@@ -4,15 +4,13 @@
 # Authors: Lauryn Stafford and Jessica Bishai
 ################################################################################
 
-source("/ihme/cc_resources/libraries/current/r/get_model_results.R")
-
 test_that("weighted_means",{
-  # Testing
+  source("/ihme/cc_resources/libraries/current/r/get_model_results.R")
   expect_error(weighted_mean("a"))
   test_df <- get_model_results(
     gbd_team = 'epi',
     gbd_id = 25217,
-    age_group_id = c(7, 8, 9, 10, 11, 12, 13, 14, 15), # mutually exclusive age groups for 10-54
+    age_group_id = c(7, 8, 9, 10, 11, 12, 13, 14, 15),
     year_id = 2020,
     sex_id = 2,
     decomp_step = 'iterative'
