@@ -35,7 +35,7 @@ weighted_mean <- function(df,
     stop("Please enter a valid gbd_round_id")
   }
   # Make sure decomp_step is valid
-  if (!(decomp_step %in% c("Iterative", 2, 3))){
+  if (!(decomp_step %in% c("iterative", 2, 3))){
     stop("Please enter a valid decomp_step")
   }
   # if the input is not model_results, have the user enter the location_set_id
