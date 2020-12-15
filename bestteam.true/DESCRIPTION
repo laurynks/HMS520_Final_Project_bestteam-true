@@ -1,0 +1,34 @@
+Package: bestteam.true
+Title: MAD Outliering, ST-GPR / DisMod Bundle Converters, & Weighted Means Functions
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Lauryn",
+           family = "Stafford",
+           role = c("aut", "cre"),
+           email = "laurynks@uw.edu",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+    person(given = "Jessica",
+           family = "Bishai",
+           role = c("aut", "cre"),
+           email = "jbishai@uw.edu",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: This package contains four general functions that are applicable to 
+              many IHME projects. The MAD Outliering function takes a dataset, such
+              as a bundle version, and outliers data based on median absolute 
+              deviation and other data grouping parameters. The ST-GPR to DisMod 
+              and DisMod to ST-GPR bundle converter functions allow conversion from DisMod
+              shape bundles and ST-GPR shape bundles. The Weighted Means function 
+              allows comparability between data using different age groups by 
+              calculating a mean weighted by population using each component age
+              group to produce an estimate or the overall age group.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    data.table,
+    tidyr,
+    dplyr
+Suggests: 
+    testthat
